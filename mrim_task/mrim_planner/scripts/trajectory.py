@@ -624,31 +624,27 @@ class TrajectoryUtils():
 
             # Decide which UAV should be delayed
             # [STUDENTS TODO] CHANGE BELOW
-            delay_robot_idx, nondelay_robot_idx = 0, 1
+            if traj_times[0] > traj_times[1]:
+                delay_robot_idx, nondelay_robot_idx = 1, 0
+            else:
+                delay_robot_idx, nondelay_robot_idx = 0, 1
 
             # TIP: use function `self.trajectoriesCollide()` to check if two trajectories are in collision
-            collision_flag, collision_idx = \
-                self.trajectoriesCollide(trajectories[delay_robot_idx], trajectories[nondelay_robot_idx], safety_distance)
 
-            i = 0
-            while collision_flag:
+            for i in range(int(traj_times[nondelay_robot_idx])):
 
-                # delay the shorter-trajectory UAV at the start point by sampling period
+                if self.trajectoriesCollide(trajectories[delay_robot_idx],
+                                            trajectories[nondelay_robot_idx],
+                                            safety_distance)[0]:
 
-                if i < 20:
-                    delay_t += delay_step
-                    # TIP: use function `trajectory.delayStart(X)` to delay a UAV at the start location by X seconds
-                    trajectories[delay_robot_idx].delayStart(delay_step)
+                    trajectories[delay_robot_idx].delayStart(1)
                 else:
-                    collision_flag = False
-
-        # # #}
+                    break
 
         if delay_robot_idx is not None:
             delayed_robots, delays = [delay_robot_idx], [delay_t]
 
         return trajectories, delayed_robots, delays
-    # # #}
 
     ## | ---------------- Functions: path smoothing --------------- |
 
