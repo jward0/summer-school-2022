@@ -460,7 +460,7 @@ class TrajectoryUtils():
             #  - check documentation for TOPPRA (look for eval() function): https://hungpham2511.github.io/toppra/index.html
             #  - use 'toppra_trajectory' and the predefined sampling step 'sampling_step'
             #samples = [] # [STUDENTS TODO] Fill this variable with trajectory samples
-            samples = toppra_trajectory(np.linspace(0, toppra_trajectory.duration, int(toppra_trajectory.duration / sampling_step)))
+            samples = toppra_trajectory(np.arange(0, toppra_trajectory.duration, sampling_step))
             # Convert to Trajectory class
             poses      = [Pose(q[0], q[1], q[2], q[3]) for q in samples]
             trajectory = self.posesToTrajectory(poses)
@@ -571,7 +571,8 @@ class TrajectoryUtils():
         path       = ta.SplineInterpolator(np.linspace(0, 1, len(waypoints)), wp_lists)
         pc_vel     = constraint.JointVelocityConstraint(v_lims)
         pc_acc     = constraint.JointAccelerationConstraint(a_lims)
-        instance   = algo.TOPPRA([pc_vel, pc_acc], path, parametrizer="ParametrizeConstAccel")
+        gridpoints = np.linspace(0, path.duration, 10000)
+        instance   = algo.TOPPRA([pc_vel, pc_acc], path, gridpoints=gridpoints)
         trajectory = instance.compute_trajectory()
 
         return trajectory
